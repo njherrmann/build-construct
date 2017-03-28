@@ -21,6 +21,7 @@ class CcdsLoader(object):
     self.ccds_id = None
     self.valid_id = None
     self.soup = None
+    self.exon_edges = None
 
     # init with a protein id is optional
     if ccds_id is not None:
@@ -29,6 +30,7 @@ class CcdsLoader(object):
 
   def load(self, ccds_id):
     self.soup = None
+    self.exon_edges = None
 
     self.ccds_id = ccds_id
     self._clean_id()
@@ -76,18 +78,19 @@ class CcdsLoader(object):
 
 
   def get_exon_edges(self):
+    if self.exon_edges is not None:
+      return self.exon_edges
+
     if self.soup is None or not(self.valid_id):
       self.logger.warning("cannot get exon edges: no soup")
       return
     
     extable = self.soup.find('small', text="Chromosome").parent.parent.parent
 
+    # Caches exon_edges until a new load command is executed.
     self.exon_edges = [tuple([int(cell.get_text()) for cell in row.find_all('td')[1:3]])
                             for row in extable.find_all('tr')[1:]]
-    print '['
-    for edge in self.exon_edges:
-      print ' ({} , {})'.format(edge[0], edge[1])
-    print ']'
+    return self.exon_edges
 
 
 if __name__ == "__main__":

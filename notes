@@ -1,4 +1,24 @@
+** TOP LEVEL **
 
-** CcdsLoader **
+- Find a way to make the program minimally terminal-dependent
+  - Is there a way to open the terminal for a direc from that finder window?
+- Get Beautiful Soup (or BS4) on macs in the Chen lab
 
-- Write get_soup() which returns the soup for the page
+
+
+** [TargetSequence] **
+
+- Does a TargetSequence with the first character or two have the same offsites?
+
+
+** [GuideBuilder] **
+
+- Right now, the sort method only sorts sequences by gen_loc. (and does it by default) Do we need another sorting metric?
+- REWORK set_start_guides()
+    while compiling each start guide candidate,
+    also build out the list of GuidePairs.
+
+
+
+GIT UPDATE NOTES
+- renamed GeneParser to GuideBuilder
