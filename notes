@@ -46,5 +46,3 @@ structure:
 
 
 GIT UPDATE NOTES
-- added TargetSequence.gene_loc_fraction attribute. Calculated when given exon_edges
-- GuideBuilder.filter_targets_in_exons(.) is now private. It is called from GuideBuilder.set_exon_edges(.)
