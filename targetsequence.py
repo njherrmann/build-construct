@@ -24,9 +24,16 @@ class TargetSequence(object):
 
     self.gc_content = self._compute_gc_content()
 
-    self.target = self._compute_target()
+    self.cut_site = self._compute_cut_site()
 
+    # This is not being prioritized right now.
     self.contains_seed_T = self._check_seed_T()
+
+    # The fraction given by the number of exon bps upstream of
+    # the cut site divided by the size of the gene
+    # (Requires exon edges to calculate)
+    self.gene_loc_frac = None
+
 
 
 
@@ -42,6 +49,7 @@ class TargetSequence(object):
       return int(gen_loc.split(':')[1].strip())
 
 
+
   def _compute_gc_content(self):
     """Sets the gc_content member to the integer-rounded percentage
     GC content of the sequence."""
@@ -51,13 +59,15 @@ class TargetSequence(object):
             100*(self.sequence.count('G') + self.sequence.count('C'))/len(self.sequence)))
 
 
-  def _compute_target(self):
-    """Computes the genomic location of the cut site (target). The location of the
+
+  def _compute_cut_site(self):
+    """Computes the genomic location of the cut site. The location of the
     cut site is the index of the base preceding the cut on the + strand."""
 
     if not(self.strand == '+' or self.strand == '-'):
       return
     return self.gen_loc + (len(self.sequence)-4 if self.strand == '+' else 2)
+
 
 
   def _check_seed_T(self):
@@ -67,9 +77,24 @@ class TargetSequence(object):
     return self.sequence[-7 : -3].count('T') > 0
 
 
-  def get_bare_sequence(self):
-    """Returns the target sequence without the PAM site."""
-    return self.sequence[:-3]
+
+  def set_gene_loc_frac(self, exon_edges):
+    """Sets gene_loc_frac attribute, which is the ratio given by the
+    number of exon bps upstream of the cut site divided by the gene size."""
+
+    gene_size = reduce(lambda tot, edge: tot + edge[1]+1 - edge[0],
+                          exon_edges, 0)
+
+    gene_loc = 0
+    for edge in exon_edges:
+      if edge[1] <= self.cut_site:
+        gene_loc += edge[1]+1 - edge[0]
+      else:
+        gene_loc += max(0 , self.cut_site+1 - edge[0])
+        break
+
+    self.gene_loc_frac = float(gene_loc) / gene_size
+
 
 
   def truncate_front(self, n_trunc):
@@ -90,9 +115,9 @@ class TargetSequence(object):
                           offtargets=self.offtargets)
 
 
-  def find_start_guides(self):
-    """Returns a list containing all possible starting guides
-    derived from this sequence."""
+
+  def find_G_starts(self):
+    """Returns a list containing all possible subguides starting with G"""
 
     guides = []
 
@@ -106,23 +131,24 @@ class TargetSequence(object):
     return guides
 
 
-  def cut_in_range(self, boundarylist):
+
+  def cut_in_range(self, exon_edges):
     """Returns True if the target site of this sequence falls
-    between any of the given boundaries (each boundary a two-element list)."""
+    between any of the given boundaries (each exon edge a two-element list)."""
 
 
-    for bnd in boundarylist:
+    for edge in exon_edges:
       # Each boundary is a 2-element list or tuple of ints
-      if len(bnd) < 2:
-        self.logger.warning('Cannot validify cut site: improper boundary shape')
+      if len(edge) < 2:
+        self.logger.warning('Cannot validify cut site: improper exon boundary shape')
         continue
-      if bnd[0] >= bnd[1]:
-        self.logger.error('Cannot validify cut site: invalid boundary specification')
+      if edge[0] >= edge[1]:
+        self.logger.error('Cannot validify cut site: invalid exon boundary specification')
         continue
 
       # Returns true if the target site is to the right of the first boundary
       #   or to the right of the penultimate boundary.
-      if (bnd[0] <= self.target <= bnd[1]-1):
+      if (edge[0] <= self.cut_site <= edge[1]-1):
         return True
 
     return False

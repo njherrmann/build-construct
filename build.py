@@ -22,7 +22,7 @@ if __name__ == '__main__':
   parser = gb.GuideBuilder()
   parser.read(CHOPCHOP_RESULTS_FILE)
 
-  parser.filter_targets_in_exons(edges)
+  parser.set_exon_edges(edges)
   print 'first 20 unfiltered sequences:'
   for i in range(20):
     print '[{}] {} {:>20} {} - ({}, {}, {}, {})'.format(parser.sequences[i].strand,

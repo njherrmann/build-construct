@@ -6,19 +6,45 @@
 
 
 
+** [settings.inp] **
+- results_file     (REQUIRED)
+- CCDS_ID          (REQUIRED)
+- output_file      (CCDS_ID_pairs.out)
+- max_offtargets   (0,0,0,0)
+- gRNA2_start_G    (True)
+- separation_limit (< 10kbp)
+- latest_gRNA1     (0.5)
+(- something to limit where in the gene the pairs appear?)
+
+
 ** [TargetSequence] **
 
-- Does a TargetSequence with the first character or two have the same offsites?
+- Does a TargetSequence with the first character or two have the same offtargets?
 
 
 ** [GuideBuilder] **
 
+- Add some machinery to parse and store settings in a dict on the instance level.
 - Right now, the sort method only sorts sequences by gen_loc. (and does it by default) Do we need another sorting metric?
-- REWORK set_start_guides()
-    while compiling each start guide candidate,
-    also build out the list of GuidePairs.
+
+
+** [build.py] **
+
+structure:
+
+  settings = sr.SettingsReader('settings.inp')
+
+  loader = ccds.CcdsLoader()
+  loader.load(settings) # contains CCDS ID
+
+  builder = gb.GuideBuilder()
+  builder.read(settings) # reads results file
+  builder.build_pairs() # assembles gene pairs
+
+  output(builder.get_pairs()) # reports pairs
 
 
 
 GIT UPDATE NOTES
-- renamed GeneParser to GuideBuilder
+- added TargetSequence.gene_loc_fraction attribute. Calculated when given exon_edges
+- GuideBuilder.filter_targets_in_exons(.) is now private. It is called from GuideBuilder.set_exon_edges(.)
