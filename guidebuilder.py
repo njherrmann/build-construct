@@ -8,7 +8,7 @@ import guidepair as gp
 
 class GuideBuilder(object):
   """An object that parses the ChopChop results.txt file.
-  Requires a settings dict with a filepath in 'results_file':
+  Requires a settings dict with a filepath in 'input_file':
   Usage:
     builder = GuideBuilder()
     builder.read(settings)
@@ -46,7 +46,7 @@ class GuideBuilder(object):
       if key not in self.settings.keys():
         self.settings[key] = value
 
-    if 'results_file' in self.settings.keys():
+    if 'input_file' in self.settings.keys():
       self.read()
 
 
@@ -62,11 +62,11 @@ class GuideBuilder(object):
 
   def read(self, filepath=None):
     """Reads and processes the ChopChop results file in filepath.
-    Uses self.settings['results_file'] if no filepath argument is given."""
+    Uses self.settings['input_file'] if no filepath argument is given."""
 
     if filepath is not None:
-      self.settings['results_file'] = filepath
-    elif 'results_file' not in self.settings.keys():
+      self.settings['input_file'] = filepath
+    elif 'input_file' not in self.settings.keys():
       self.logger.warning('Cannot read file: specify a filepath')
       return
 
@@ -74,7 +74,7 @@ class GuideBuilder(object):
     self.sequences = []
     self.guidepairs = []
 
-    file = open(self.settings['results_file'], 'r')
+    file = open(self.settings['input_file'], 'r')
 
     for i, line in enumerate(file):
 

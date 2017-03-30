@@ -5,8 +5,8 @@ import ccdsloader as ccds
 
 
 
-SETTINGS = {'CCDS_ID'      : 'CCDS7612' ,
-            'results_file' : 'NM_005308_results.txt' }
+SETTINGS = {'CCDS_ID'     : 'CCDS7612' ,
+            'input_file'  : 'NM_005308_results.txt' }
 
 
 if __name__ == '__main__':
