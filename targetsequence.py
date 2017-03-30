@@ -102,6 +102,14 @@ class TargetSequence(object):
 
 
 
+  def overlap_Q(self, other_seq):
+    """Returns True if this sequence overlaps other_seq."""
+
+    return not(self.gen_loc + len(self.sequence) <= other_seq.gen_loc or
+               other_seq.gen_loc + len(other_seq.sequence) <= self.gen_loc)
+
+
+
   def truncate_front(self, n_trunc):
     """Returns a TargetSequence of this sequence with 
     the first n_trunc characters removed."""
