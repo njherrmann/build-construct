@@ -33,7 +33,12 @@ class TargetSequence(object):
     # the cut site divided by the size of the gene
     # (Requires exon edges to calculate)
     self.gene_loc_frac = None
+    if 'gene_loc_frac' in kwargs.keys():
+      self.gene_loc_frac = float(kwargs['gene_loc_frac'])
 
+
+  def __str__(self):
+    return self.sequence
 
 
 
@@ -66,7 +71,7 @@ class TargetSequence(object):
 
     if not(self.strand == '+' or self.strand == '-'):
       return
-    return self.gen_loc + (len(self.sequence)-4 if self.strand == '+' else 2)
+    return self.gen_loc + (len(self.sequence)-4 if self.strand == '+' else 5)
 
 
 
@@ -104,6 +109,9 @@ class TargetSequence(object):
     if n_trunc == 0:
       return self
 
+    if self.gene_loc_frac is None:
+      self.logger.warning('Truncating TargetSequence without gene location fraction.')
+
     if len(self.sequence) - n_trunc < 18:
       self.logger.warning('Cannot truncate: resulting guide would have fewer than 18 bases.')
       return
@@ -112,7 +120,8 @@ class TargetSequence(object):
                           gen_loc=self.gen_loc + (n_trunc if self.strand == '+' else 0),
                           exon_num=self.exon_num,
                           strand=self.strand,
-                          offtargets=self.offtargets)
+                          offtargets=self.offtargets,
+                          gene_loc_frac=self.gene_loc_frac)
 
 
 

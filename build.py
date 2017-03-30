@@ -5,50 +5,38 @@ import ccdsloader as ccds
 
 
 
-CCDS_ID = 'CCDS7612'
-CHOPCHOP_RESULTS_FILE = 'NM_005308_results.txt'
-
+SETTINGS = {'CCDS_ID'      : 'CCDS7612' ,
+            'results_file' : 'NM_005308_results.txt' }
 
 
 if __name__ == '__main__':
   loader = ccds.CcdsLoader()
-  loader.load(CCDS_ID)
+  loader.load(SETTINGS['CCDS_ID'])
   edges = loader.get_exon_edges()
-  print 'exon edges'
-  for edge in edges:
-    print '{} - {}'.format(edge[0], edge[1])
-  print
-
-  parser = gb.GuideBuilder()
-  parser.read(CHOPCHOP_RESULTS_FILE)
-
-  parser.set_exon_edges(edges)
-  print 'first 20 unfiltered sequences:'
-  for i in range(20):
-    print '[{}] {} {:>20} {} - ({}, {}, {}, {})'.format(parser.sequences[i].strand,
-                                 parser.sequences[i].gen_loc,
-                                 parser.sequences[i].sequence,
-                                 parser.sequences[i].gen_loc + len(parser.sequences[i].sequence),
-                                 parser.sequences[i].offtargets[0],
-                                 parser.sequences[i].offtargets[1],
-                                 parser.sequences[i].offtargets[2],
-                                 parser.sequences[i].offtargets[3]
-                             )
-
-  parser.filter_offtargets()
-  print 'all {} filtered sequences by offtargets:'.format(len(parser.sequences))
-  for i in range(len(parser.sequences)):
-    print '[{}] {} {:>23} {} - ({}, {}, {}, {})'.format(parser.sequences[i].strand,
-                                 parser.sequences[i].gen_loc,
-                                 parser.sequences[i].sequence,
-                                 parser.sequences[i].gen_loc + len(parser.sequences[i].sequence),
-                                 parser.sequences[i].offtargets[0],
-                                 parser.sequences[i].offtargets[1],
-                                 parser.sequences[i].offtargets[2],
-                                 parser.sequences[i].offtargets[3]
-                             )
   
-  
-  
+  #print 'exon edges'
+  #for edge in edges:
+  #  print '{} - {}'.format(edge[0], edge[1])
+  #print
 
-
+  builder = gb.GuideBuilder(SETTINGS)
+  builder.read()
+  builder.set_exon_edges(edges)
+  builder.build_pairs()
+  builder.sort_pairs(keystr="deletion_count")
+  pairs = builder.get_pairs()
+  
+  print 'number of pairs: {}'.format(len(pairs))
+  print 'genm_loc_1  loc_frac_1  |  genm_loc_2  loc_frac_2  |  separation  |  del_count   del_pct    |    seq_1                 seq_2'
+  for i in range(len(pairs)):
+ #   print pairs[i].seq2
+    print '{:>10}  {:>8.3}    |  {:>10}  {:>8.3}    |  {:>8}    |  {:>7}   {:>8}     |  {:>20}  {:>20}'.format(
+                    pairs[i].seq1.gen_loc,
+                    pairs[i].seq1.gene_loc_frac,
+                    pairs[i].seq2.gen_loc,
+                    pairs[i].seq2.gene_loc_frac,
+                    pairs[i].seq2.cut_site - pairs[i].seq1.cut_site,
+                    pairs[i].deletion_count,
+                    int(pairs[i].deletion_fraction * 100),
+                    pairs[i].seq1,
+                    pairs[i].seq2 )

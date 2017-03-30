@@ -7,22 +7,33 @@ import guidepair as gp
 
 
 class GuideBuilder(object):
-  """An object that parses the ChopChop results.txt file"""
+  """An object that parses the ChopChop results.txt file.
+  Requires a settings dict with a filepath in 'results_file':
+  Usage:
+    builder = GuideBuilder()
+    builder.read(settings)
+    builder.set_exon_edges(edges)
+    builder.build_pairs()
+    pairs = builder.get_pairs()
+  """
+
+  # A GuideBuilder can be initialized with settings which are used for
+  # naked read() command, or a GuideBuilder can be initalized bare
+  # then settings are as an argument: read(settings).
   
   # A container for default settings
-  DEFAULTS = { 'max_offtargets'   : (0, 0, 0, 0) ,
+  _DEFAULTS = { 'max_offtargets'   : (0, 0, 0, 0) ,
                'gRNA2_start_G'    : True ,  # True if seq 2 must start with G
                'separation_limit' : 10000 , # Max separation between cut sites in bp
-               'latest_gRNA1'     : 0.5     # Latest location for gRNA1 as a
+               'latest_gRNA2'     : 0.5     # Latest location for gRNA2 as a
                                             #   as a fraction of gene sequence
                }
 
 
-  def __init__(self, settings=DEFAULTS):
+  def __init__(self, settings=_DEFAULTS):
     
     self.logger = log.getLogger(__name__)
 
-    self.file = None
     self.sequences = []
     self.guidepairs = []
     self.exon_edges = None
@@ -30,35 +41,42 @@ class GuideBuilder(object):
 
     self.settings = settings
 
-    # Copies unspecified fields to settings from DEFAULTS
-    for key, value in DEFAULTS.items():
-      if key not self.settings.keys():
+    # Copies unspecified fields to settings from _DEFAULTS
+    for key, value in GuideBuilder._DEFAULTS.items():
+      if key not in self.settings.keys():
         self.settings[key] = value
 
-    if 'input_path' in self.settings.keys():
+    if 'results_file' in self.settings.keys():
       self.read()
+
+
+  def clear(self):
+    """Clears instance attributes."""
+    self.sequences = []
+    self.guidepairs = []
+    self.exon_edges = None
+    self.gene_size = None
+    self.settings = GuideBuilder._DEFAULTS
 
 
 
   def read(self, filepath=None):
     """Reads and processes the ChopChop results file in filepath.
-    Uses self.settings['filepath'] if no filepath argument is given."""
+    Uses self.settings['results_file'] if no filepath argument is given."""
 
     if filepath is not None:
-      self.settings['input_path'] = filepath
-    elif 'input_path' not in self.settings.keys():
+      self.settings['results_file'] = filepath
+    elif 'results_file' not in self.settings.keys():
       self.logger.warning('Cannot read file: specify a filepath')
       return
 
 
     self.sequences = []
     self.guidepairs = []
-    self.exon_edges = exon_edges
 
+    file = open(self.settings['results_file'], 'r')
 
-    self.file = open(self.settings['input_path'], 'r')
-
-    for i, line in enumerate(self.file):
+    for i, line in enumerate(file):
 
       if i == 0:  # The first line is a text header
         continue
@@ -75,10 +93,11 @@ class GuideBuilder(object):
                                      offtargets=tokens[7:11]))
       
       # The sequence table is sorted by ascending genomic location
-      self.sort_sequences(self.sequences, keystr="gen_loc")
+      self.sort_sequences(keystr="gen_loc")
 
       self._filter_offtargets()
 
+      # Filters and sets locations for sequences if exon_edges already set
       if self.exon_edges is not None:
         self.gene_size = reduce(lambda tot, edge: tot + edge[1]+1 - edge[0],
                           self.exon_edges, 0)
@@ -89,31 +108,29 @@ class GuideBuilder(object):
       
 
 
-
-
-  def sort_sequences(self, sequencelist, keystr=None):
+  def sort_sequences(self, keystr=None):
     """Sorts the list of sequences in place by a given field. 
     Sequences are sorted by ascending genomic location by default (no keystr)"""
 
     if keystr is None or keystr == "gen_loc":
-      sequencelist.sort(key=lambda seq: seq.gen_loc)
+      self.sequences.sort(key=lambda seq: seq.gen_loc)
     else:
       self.logger.warning("Cannot sort pair list: invalid key string")
 
 
 
-  def sort_pairs(self, pairlist, keystr=None):
+  def sort_pairs(self, keystr=None):
     """Sorts the list of GuidePairs in place by a given field. 
     Pairs are sorted by ascending genomic location of seq1 by default (no keystr)"""
 
     if keystr is None or keystr == "gen_loc" or keystr == "genomic_location":
-      pairlist.sort(key=lambda pair: pair.seq1.gen_loc)
+      self.guidepairs.sort(key=lambda pair: pair.seq1.gen_loc)
     elif keystr == "gen_sep" or keystr == "genomic_separation":
-      pairlist.sort(key=lambda pair: pair.genomic_separation)
-    elif keystr == "del_cont" or keystr == "deletion_content":
-      pairlist.sort(key=lambda pair: pair.deletion_content)
+      self.guidepairs.sort(key=lambda pair: pair.genomic_separation)
+    elif keystr == "del_count" or keystr == "deletion_count":
+      self.guidepairs.sort(key=lambda pair: -1 * pair.deletion_count)
     elif keystr == "del_frac" or keystr == "deletion_fraction":
-      pairlist.sort(key=lambda pair: pair.deletion_fraction)
+      self.guidepairs.sort(key=lambda pair: -1 * pair.deletion_fraction)
     else:
       self.logger.warning("Cannot sort pair list: invalid key string")
 
@@ -182,37 +199,46 @@ class GuideBuilder(object):
 
 
     # Sorts sequences by ascending genomic location
-    self.sort_sequences(self.sequences, keystr="gen_loc")
+    self.sort_sequences(keystr="gen_loc")
 
     # A queue of gRNAs awaiting second sequences to pair
     start_seqs = []
 
-    for seq in self.sequences:
+    for seq2 in self.sequences:
 
       # Iterates across a *copy* of start_seqs so that some sequences
       # can be removed from the original during iteration
-      for start in list(start_seqs):
+      for seq1 in list(start_seqs):
         # Pops start sequences that are too far upstream
-        if abs(seq.cut_site - start.cut_site) > self.settings['separation_limit']:
+        if abs(seq2.cut_site - seq1.cut_site) > self.settings['separation_limit']:
           start_seqs.pop(0)
         
         else:
-          if start.cut_site == seq.cut_site:
+          if seq1.cut_site == seq2.cut_site:
             continue
           if self.settings['gRNA2_start_G']:
-            self.guidepairs.append(gp.GuidePair(start, seq))
+            self.guidepairs += [gp.GuidePair(seq1, g_seq2, self.exon_edges) 
+                                  for g_seq2 in seq2.find_G_starts()]
           else:
-            self.guidepairs += [gp.GuidePair(start, g_seq) 
-                                  for g_seq in seq.find_G_starts()]
+            self.guidepairs.append(gp.GuidePair(seq1, seq2, self.exon_edges))
 
-        start_seq_queue += seq.find_G_starts()
+      start_seqs += seq2.find_G_starts()
 
 
-      if seq.gene_loc_frac > self.settings['latest_gRNA1']:
+      if seq2.gene_loc_frac > self.settings['latest_gRNA2']:
         break
 
+    self.sort_pairs(keystr="del_count")
 
 
+  def get_pairs(self):
+    return self.guidepairs
+
+  def get_sequences(self):
+    return self.sequences
+
+  def get_gene_size(self):
+    return self.gene_size  
 
 
 

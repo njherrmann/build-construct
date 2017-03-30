@@ -3,17 +3,19 @@
 - Find a way to make the program minimally terminal-dependent
   - Is there a way to open the terminal for a direc from that finder window?
 - Get Beautiful Soup (or BS4) on macs in the Chen lab
+- Omit GuidePairs if the sequences overlap
 
 
 
 ** [settings.inp] **
-- results_file     (REQUIRED)
+-        (REQUIRED)
 - CCDS_ID          (REQUIRED)
 - output_file      (CCDS_ID_pairs.out)
 - max_offtargets   (0,0,0,0)
 - gRNA2_start_G    (True)
 - separation_limit (< 10kbp)
-- latest_gRNA1     (0.5)
+- latest_gRNA2     (0.5)
+- min_exon_del     (no min?)
 (- something to limit where in the gene the pairs appear?)
 
 
@@ -39,6 +41,7 @@ structure:
 
   builder = gb.GuideBuilder()
   builder.read(settings) # reads results file
+  builder.set_exon_edges(loader.get_exon_edges())
   builder.build_pairs() # assembles gene pairs
 
   output(builder.get_pairs()) # reports pairs
