@@ -14,11 +14,12 @@ class GuidePair(object):
       self.seq1, self.seq2 = seq2, seq1
 
 
-    self.genomic_separation = abs(self.seq2.gen_loc - self.seq1.gen_loc)
+    self.genomic_separation = abs(self.seq2.cut_site - self.seq1.cut_site)
 
 
     self.deletion_count = None
     self.deletion_fraction = None
+    self.deletion_pct = None
     if exon_edges is not None:
       self.compute_deletion_stats(exon_edges)
 
@@ -61,6 +62,7 @@ class GuidePair(object):
 
 
     self.deletion_fraction = float(self.deletion_count) / gene_size
+    self.deletion_pct = int(100 * self.deletion_fraction)
 
 
 

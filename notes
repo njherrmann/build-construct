@@ -7,18 +7,6 @@
 
 
 
-** [settings.inp] **
--        (REQUIRED)
-- CCDS_ID          (REQUIRED)
-- output_file      (CCDS_ID_pairs.out)
-- max_offtargets   (0,0,0,0)
-- gRNA2_start_G    (True)
-- separation_limit (< 10kbp)
-- latest_gRNA2     (0.5)
-- min_exon_del     (no min?)
-(- something to limit where in the gene the pairs appear?)
-
-
 ** [TargetSequence] **
 
 - Does a TargetSequence with the first character or two have the same offtargets?
@@ -39,8 +27,7 @@ structure:
   loader = ccds.CcdsLoader()
   loader.load(settings) # contains CCDS ID
 
-  builder = gb.GuideBuilder()
-  builder.read(settings) # reads results file
+  builder = gb.GuideBuilder(settings.settings)
   builder.set_exon_edges(loader.get_exon_edges())
   builder.build_pairs() # assembles gene pairs
 

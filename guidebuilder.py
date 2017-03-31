@@ -22,11 +22,12 @@ class GuideBuilder(object):
   # then settings are as an argument: read(settings).
   
   # A container for default settings
-  _DEFAULTS = { 'max_offtargets'   : (0, 0, 0, 0) ,
-               'gRNA2_start_G'    : True ,  # True if seq 2 must start with G
-               'separation_limit' : 10000 , # Max separation between cut sites in bp
-               'latest_gRNA2'     : 0.5     # Latest location for gRNA2 as a
-                                            #   as a fraction of gene sequence
+  _DEFAULTS = { 'max_offtargets'    : (0, 0, 0, 0) ,
+                'gRNA2_start_G'     : True ,  # True if seq 2 must start with G
+                'separation_limit'  : 10000 , # Max separation between cut sites in bp
+                'latest_gRNA2'      : 0.5 ,   # Latest location for gRNA2 as a
+                                              #   as a fraction of gene sequence
+                'min_exon_deletion' : 0       # min count of exon bps to delete
                }
 
 
@@ -40,6 +41,9 @@ class GuideBuilder(object):
     self.gene_size = None
 
     self.settings = settings
+
+    if not('input_file' in self.settings.keys() and 'CCDS_ID' in self.settings.keys()):
+      self.logger.error('Cannot instantiate GuideBuilder without input_file and CCDS_ID settings.')
 
     # Copies unspecified fields to settings from _DEFAULTS
     for key, value in GuideBuilder._DEFAULTS.items():
@@ -88,12 +92,12 @@ class GuideBuilder(object):
       # We also discard the PAM sites from the target sequences.
       tokens = line.split()
       self.sequences.append(
-                   ts.TargetSequence(sequence=tokens[1][:-3], gen_loc=tokens[2],
+                   ts.TargetSequence(sequence=tokens[1][:-3], gnm_loc=tokens[2],
                                      exon_num=tokens[3], strand=tokens[4],
                                      offtargets=tokens[7:11]))
       
       # The sequence table is sorted by ascending genomic location
-      self.sort_sequences(keystr="gen_loc")
+      self.sort_sequences(keystr="cut_site")
 
       self._filter_offtargets()
 
@@ -105,6 +109,8 @@ class GuideBuilder(object):
         for seq in self.sequences:
           seq.set_gene_loc_frac(self.exon_edges)
 
+    self.logger.info('Successfully read input file %s' % self.settings['input_file'])
+
       
 
 
@@ -112,8 +118,10 @@ class GuideBuilder(object):
     """Sorts the list of sequences in place by a given field. 
     Sequences are sorted by ascending genomic location by default (no keystr)"""
 
-    if keystr is None or keystr == "gen_loc":
-      self.sequences.sort(key=lambda seq: seq.gen_loc)
+    if keystr is None or keystr == "gnm_loc":
+      self.sequences.sort(key=lambda seq: seq.gnm_loc)
+    if keystr == "cut_site":
+      self.sequences.sort(key=lambda seq: seq.cut_site)
     else:
       self.logger.warning("Cannot sort pair list: invalid key string")
 
@@ -123,8 +131,8 @@ class GuideBuilder(object):
     """Sorts the list of GuidePairs in place by a given field. 
     Pairs are sorted by ascending genomic location of seq1 by default (no keystr)"""
 
-    if keystr is None or keystr == "gen_loc" or keystr == "genomic_location":
-      self.guidepairs.sort(key=lambda pair: pair.seq1.gen_loc)
+    if keystr is None or keystr == "gnm_loc" or keystr == "genomic_location":
+      self.guidepairs.sort(key=lambda pair: pair.seq1.gnm_loc)
     elif keystr == "gen_sep" or keystr == "genomic_separation":
       self.guidepairs.sort(key=lambda pair: pair.genomic_separation)
     elif keystr == "del_count" or keystr == "deletion_count":
@@ -199,7 +207,7 @@ class GuideBuilder(object):
 
 
     # Sorts sequences by ascending genomic location
-    self.sort_sequences(keystr="gen_loc")
+    self.sort_sequences(keystr="cut_site")
 
     # A queue of gRNAs awaiting second sequences to pair
     start_seqs = []
@@ -212,15 +220,22 @@ class GuideBuilder(object):
         # Pops start sequences that are too far upstream
         if abs(seq2.cut_site - seq1.cut_site) > self.settings['separation_limit']:
           start_seqs.pop(0)
+          continue
         
+        # Skips overlapping sequences
+        elif seq1.overlap_Q(seq2):
+          continue
+
         else:
-          if seq1.cut_site == seq2.cut_site:
-            continue
           if self.settings['gRNA2_start_G']:
-            self.guidepairs += [gp.GuidePair(seq1, g_seq2, self.exon_edges) 
-                                  for g_seq2 in seq2.find_G_starts()]
+            self.guidepairs += filter(lambda pair: pair.deletion_count >= self.settings['min_exon_deletion'],
+                        [gp.GuidePair(seq1, g_seq2, self.exon_edges) for g_seq2 in seq2.find_G_starts()])
           else:
-            self.guidepairs.append(gp.GuidePair(seq1, seq2, self.exon_edges))
+            new_guidepair = gp.GuidePair(seq1, seq2, self.exon_edges)
+            if new_guidepair.deletion_count >= self.settings['min_exon_deletion']:
+              self.guidepairs.append(new_guidepair)
+            else:
+              continue
 
       start_seqs += seq2.find_G_starts()
 
@@ -229,6 +244,7 @@ class GuideBuilder(object):
         break
 
     self.sort_pairs(keystr="del_count")
+    self.logger.info('Guide pairs compiled')
 
 
   def get_pairs(self):
@@ -239,16 +255,3 @@ class GuideBuilder(object):
 
   def get_gene_size(self):
     return self.gene_size  
-
-
-
-
-
-if __name__ == '__main__':
-  gp = BlockBuilder()
-  gp.read('NM_005308_results.txt')
-  print 'first 10 unfiltered sequences:'
-  for i in range(10):
-    print '{} ({}) {}'.format(gp.sequences[i].gen_loc%10000, gp.sequences[i].strand, gp.sequences[i].sequence)
-
-  

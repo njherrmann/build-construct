@@ -1,8 +1,11 @@
+#!/usr/bin/env python
+
 
 import log
 import guidebuilder as gb
 import ccdsloader as ccds
-
+import settingsreader as sr
+import outputformatter as of
 
 
 SETTINGS = {'CCDS_ID'     : 'CCDS7612' ,
@@ -10,8 +13,11 @@ SETTINGS = {'CCDS_ID'     : 'CCDS7612' ,
 
 
 if __name__ == '__main__':
+  
+  settings = sr.SettingsReader('settings.inp')
+
   loader = ccds.CcdsLoader()
-  loader.load(SETTINGS['CCDS_ID'])
+  loader.load(settings.settings['CCDS_ID'])
   edges = loader.get_exon_edges()
   
   #print 'exon edges'
@@ -19,24 +25,27 @@ if __name__ == '__main__':
   #  print '{} - {}'.format(edge[0], edge[1])
   #print
 
-  builder = gb.GuideBuilder(SETTINGS)
-  builder.read()
+  builder = gb.GuideBuilder(settings.settings)
   builder.set_exon_edges(edges)
   builder.build_pairs()
   builder.sort_pairs(keystr="deletion_count")
   pairs = builder.get_pairs()
-  
-  print 'number of pairs: {}'.format(len(pairs))
-  print 'genm_loc_1  loc_frac_1  |  genm_loc_2  loc_frac_2  |  separation  |  del_count   del_pct    |    seq_1                 seq_2'
-  for i in range(len(pairs)):
- #   print pairs[i].seq2
-    print '{:>10}  {:>8.3}    |  {:>10}  {:>8.3}    |  {:>8}    |  {:>7}   {:>8}     |  {:>20}  {:>20}'.format(
-                    pairs[i].seq1.gen_loc,
-                    pairs[i].seq1.gene_loc_frac,
-                    pairs[i].seq2.gen_loc,
-                    pairs[i].seq2.gene_loc_frac,
-                    pairs[i].seq2.cut_site - pairs[i].seq1.cut_site,
-                    pairs[i].deletion_count,
-                    int(pairs[i].deletion_fraction * 100),
-                    pairs[i].seq1,
-                    pairs[i].seq2 )
+
+  outputter = of.OutputFormatter()
+  outputter.write(pairs, settings.settings['output_file'])
+    
+#  print 'number of pairs: {}'.format(len(pairs))
+#  print ' n  |  genm_loc_1  loc_frac_1  |  genm_loc_2  loc_frac_2  |  separation  |  del_count   del_pct    |    seq_1                 seq_2'
+#  for i in range(len(pairs)):
+#    print pairs[i].seq2
+#    print '{:>2}  |  {:>10}  {:>8.3}    |  {:>10}  {:>8.3}    |  {:>8}    |  {:>7}   {:>8}     |  {:>20}  {:>20}'.format(
+#                    i+1,
+#                    pairs[i].seq1.gnm_loc,
+#                    pairs[i].seq1.gene_loc_frac,
+#                    pairs[i].seq2.gnm_loc,
+#                    pairs[i].seq2.gene_loc_frac,
+#                    pairs[i].seq2.cut_site - pairs[i].seq1.cut_site,
+#                    pairs[i].deletion_count,
+#                    pairs[i].deletion_pct,
+#                    pairs[i].seq1,
+#                    pairs[i].seq2 )

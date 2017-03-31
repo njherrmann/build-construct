@@ -13,7 +13,7 @@ class TargetSequence(object):
     self.sequence = str(kwargs['sequence'])
 
     # the genomic location of the first base of the sequence - [int]
-    self.gen_loc = self._convert_gen_loc(kwargs['gen_loc'])
+    self.gnm_loc = self._convert_gnm_loc(kwargs['gnm_loc'])
 
     self.exon_num = int(kwargs['exon_num'])
 
@@ -42,16 +42,16 @@ class TargetSequence(object):
 
 
 
-  def _convert_gen_loc(self, gen_loc):
-    """The gen_loc attribute should be an int but it will probably
-     be served as a string in the form 'chr##:#######' with the gen_loc 
+  def _convert_gnm_loc(self, gnm_loc):
+    """The gnm_loc attribute should be an int but it will probably
+     be served as a string in the form 'chr##:#######' with the gnm_loc 
      given by the number following the colon."""
 
-    if type(gen_loc) == int:
-      return gen_loc
+    if type(gnm_loc) == int:
+      return gnm_loc
 
-    elif type(gen_loc) == str:
-      return int(gen_loc.split(':')[1].strip())
+    elif type(gnm_loc) == str:
+      return int(gnm_loc.split(':')[1].strip())
 
 
 
@@ -71,7 +71,7 @@ class TargetSequence(object):
 
     if not(self.strand == '+' or self.strand == '-'):
       return
-    return self.gen_loc + (len(self.sequence)-4 if self.strand == '+' else 5)
+    return self.gnm_loc + (len(self.sequence)-4 if self.strand == '+' else 5)
 
 
 
@@ -105,8 +105,8 @@ class TargetSequence(object):
   def overlap_Q(self, other_seq):
     """Returns True if this sequence overlaps other_seq."""
 
-    return not(self.gen_loc + len(self.sequence) <= other_seq.gen_loc or
-               other_seq.gen_loc + len(other_seq.sequence) <= self.gen_loc)
+    return not(self.gnm_loc + len(self.sequence) <= other_seq.gnm_loc or
+               other_seq.gnm_loc + len(other_seq.sequence) <= self.gnm_loc)
 
 
 
@@ -125,7 +125,7 @@ class TargetSequence(object):
       return
 
     return TargetSequence(sequence=self.sequence[n_trunc : ], 
-                          gen_loc=self.gen_loc + (n_trunc if self.strand == '+' else 0),
+                          gnm_loc=self.gnm_loc + (n_trunc if self.strand == '+' else 0),
                           exon_num=self.exon_num,
                           strand=self.strand,
                           offtargets=self.offtargets,
