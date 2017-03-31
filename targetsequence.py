@@ -8,7 +8,7 @@ class TargetSequence(object):
     self.logger = log.getLogger(__name__)
 
     if 'sequence' not in kwargs.keys():
-      self.logger 
+      self.logger.error('Cannot build a TargetSequence object without a sequence string.')
 
     self.sequence = str(kwargs['sequence'])
 
