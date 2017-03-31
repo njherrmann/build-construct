@@ -17,11 +17,11 @@ SETTINGS = {'CCDS_ID'     : 'CCDS7612' ,
 if __name__ == '__main__':
 
   logger = log.getLogger("main")
-  log.info('Building constructs in %s' % os.getcwd())
+  logger.info('Building constructs in %s' % os.getcwd())
 
 
   settings = sr.SettingsReader(sys.argv[1])
-  log.info('Reading settings from %s' % sys.argv[1])
+  logger.info('Reading settings from %s' % sys.argv[1])
 
   loader = ccds.CcdsLoader()
   loader.load(settings.settings['CCDS_ID'])
