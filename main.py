@@ -2,6 +2,7 @@
 
 
 import log
+import sys
 import guidebuilder as gb
 import ccdsloader as ccds
 import settingsreader as sr
@@ -14,7 +15,7 @@ SETTINGS = {'CCDS_ID'     : 'CCDS7612' ,
 
 if __name__ == '__main__':
   
-  settings = sr.SettingsReader('settings.inp')
+  settings = sr.SettingsReader(sys.argv[1])
 
   loader = ccds.CcdsLoader()
   loader.load(settings.settings['CCDS_ID'])
