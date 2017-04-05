@@ -1,38 +1,9 @@
 ** TOP LEVEL **
 
-- Find a way to make the program minimally terminal-dependent
-  - Is there a way to open the terminal for a direc from that finder window?
-- Get Beautiful Soup (or BS4) on macs in the Chen lab
-- Omit GuidePairs if the sequences overlap
 
-
-
-** [TargetSequence] **
-
-- Does a TargetSequence with the first character or two have the same offtargets?
 
 
 ** [GuideBuilder] **
 
 - Add some machinery to parse and store settings in a dict on the instance level.
 - Right now, the sort method only sorts sequences by gen_loc. (and does it by default) Do we need another sorting metric?
-
-
-** [build.py] **
-
-structure:
-
-  settings = sr.SettingsReader('settings.inp')
-
-  loader = ccds.CcdsLoader()
-  loader.load(settings) # contains CCDS ID
-
-  builder = gb.GuideBuilder(settings.settings)
-  builder.set_exon_edges(loader.get_exon_edges())
-  builder.build_pairs() # assembles gene pairs
-
-  output(builder.get_pairs()) # reports pairs
-
-
-
-GIT UPDATE NOTES

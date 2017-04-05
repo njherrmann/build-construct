@@ -109,7 +109,7 @@ class GuideBuilder(object):
         for seq in self.sequences:
           seq.set_gene_loc_frac(self.exon_edges)
 
-    self.logger.info('Successfully read input file %s' % self.settings['input_file'])
+    self.logger.info('Successfully read input file %s' % self.settings['input_file'].split('/')[-1])
 
       
 

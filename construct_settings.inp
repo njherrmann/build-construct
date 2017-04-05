@@ -5,12 +5,12 @@
 
 
 CCDS_ID             CCDS7612
-input_file          NM_005308_results.txt
+input_file          /home/n/Projects/coding/grna-block-builder/NM_005308_results.txt
 
 
 # NB: blank lines and comments (which start with #) are ignored
 
-# output_file      [input_filename].out   ### The output filepath.
+# output_file      [input_file basename]_constructs.csv   ### The output filepath.
 # gRNA2_start_G    True         ### True if gRNA 2 must start with G
 # separation_limit 10           ### Maximum kbp between cut sites
 # latest_gRNA2     0.5          ### Position of gRNA 2 as a fraction of + strand exon content

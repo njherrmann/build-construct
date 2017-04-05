@@ -36,7 +36,7 @@ class CcdsLoader(object):
     self._clean_id()
     if self.valid_id:
       self._get_soup()
-      self.logger.info("CCDS entry loaded")
+      self.logger.info("CCDS%s entry loaded" % self.ccds_id)
 
 
   def _clean_id(self):

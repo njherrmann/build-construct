@@ -10,9 +10,6 @@ import settingsreader as sr
 import outputformatter as of
 
 
-SETTINGS = {'CCDS_ID'     : 'CCDS7612' ,
-            'input_file'  : 'NM_005308_results.txt' }
-
 
 if __name__ == '__main__':
 
@@ -34,5 +31,5 @@ if __name__ == '__main__':
   builder.sort_pairs(keystr="deletion_count")
   pairs = builder.get_pairs()
 
-  outputter = of.OutputFormatter()
+  outputter = of.OutputFormatter('/home/n/Projects/coding/grna-block-builder/gene_block_constants.const')
   outputter.write(pairs, settings.settings['output_file'])

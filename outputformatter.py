@@ -6,11 +6,11 @@ import csv
 class OutputFormatter(object):
   """Writes potential construct data to a csv file."""
 
-  def __init__(self):
+  def __init__(self, constants_file):
     self.logger = log.getLogger(__name__)
 
     self.gene_block_constants = {}
-    self._read_gene_block_constants('gene_block_constants.dat')
+    self._read_gene_block_constants(constants_file)
 
 
 
@@ -73,4 +73,4 @@ class OutputFormatter(object):
                          '',
                          self._assemble_construct(pair)])
 
-    self.logger.info('Successfully wrote constructs to %s' % outfilepath)
+    self.logger.info('Successfully wrote constructs to %s' % outfilepath.split('/')[-1])

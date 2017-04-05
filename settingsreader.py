@@ -70,4 +70,5 @@ class SettingsReader(object):
 
 
     if 'output_file' not in self.settings.keys():
-      self.settings['output_file'] = self.settings['input_file'].split('.')[0] + '_constructs.csv'
+      self.settings['output_file'] = ".".join(self.settings['input_file'].split('.')[:-1]) \
+                                             + '_constructs.csv'
