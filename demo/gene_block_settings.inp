@@ -4,8 +4,9 @@
 # All other settings are optional.
 
 
+# These demo files are for the grk5 gene
 CCDS_ID             CCDS7612
-input_file          src/NM_005308_results.txt
+input_file          NM_005308_results.txt
 
 
 # NB: blank lines and comments (which start with #) are ignored
