@@ -24,9 +24,9 @@ There is no app version of the script yet. Find instructions below to run the sc
 Installation/Setup
 ------------------
 
-The project directory contains a script named setup.sh. Using the Terminal, navigate to the project directory and run the setup script by executing the following shell command:
+The project directory contains a script named setup.sh. Using the Terminal, navigate to the project directory and run the setup script by executing the following shell command (do not omit the preceding dot (.) character):
 
-  bash setup.sh
+  . setup.sh
 
 
 
