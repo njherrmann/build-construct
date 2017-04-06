@@ -48,8 +48,8 @@ fi
 echo "Adding logging repo to python path."
 echo "
 
-# Added by build-construct setup script
-export PYTHONPATH=\$PYTHONPATH:${PROJECT_DIR}/log" >> $HOME/.bashrc
+# Added by build-construct setup script" >> $HOME/.bashrc
+echo export PYTHONPATH=\$PYTHONPATH:`echo $PROJECT_DIR | sed 's/\ /\\\\ /g'`/log >> $HOME/.bashrc
 
 # Reloads the .bashrc file (with added PYTHONPATH entry)
 source ~/.bashrc
