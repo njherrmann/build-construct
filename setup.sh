@@ -4,27 +4,29 @@ START_DIR="${PWD}"
 PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "Appending project directory to PATH variable."
-PATH="${PROJECT_DIR}:\$PATH"
+PATH=$PROJECT_DIR:$PATH
 
 # Adds a line to the bash profile that always adds the project directory
 # to the $PATH environment variable
 if [ -f "$HOME/.bash_profile" ] ; then
-  echo '
-        # Added by build-construct setup script
-        PATH="${PROJECT_DIR}:\$PATH"
-        ' >> $HOME/.bash_profile
+  echo "
+
+# Added by build-construct setup script
+PATH=\"${PROJECT_DIR}:\$PATH\"" >> $HOME/.bash_profile
 
 elif [ -f "$HOME/.profile" ] ; then
-  echo '
-        # Added by build-construct setup script
-        PATH="${PROJECT_DIR}:\$PATH"
-        ' >> $HOME/.profile
-else
-  echo '# ~/.bash_profile: executed by the command interpreter for login shells.
+  echo "
 
-        # Added by build-construct setup script
-        PATH="${PROJECT_DIR}:\$PATH"
-        ' >> $HOME/.bash_profile
+# Added by build-construct setup script
+PATH=\"${PROJECT_DIR}:\$PATH\"" >> $HOME/.profile
+
+else
+  echo "
+
+# ~/.bash_profile: executed by the command interpreter for login shells.
+
+# Added by build-construct setup script
+PATH=\"${PROJECT_DIR}:\$PATH\"" >> $HOME/.bash_profile
 fi
 
 
@@ -42,10 +44,10 @@ fi
 
 # Adds log to the python path variable on startup
 echo "Adding logging repo to python path."
-echo '
-      # Added by build-construct setup script
-      export PYTHONPATH="${PYTHONPATH}:${PROJECT_DIR}/log"
-      ' >> $HOME/.bashrc
+echo "
+
+# Added by build-construct setup script
+export PYTHONPATH=\$PYTHONPATH:${PROJECT_DIR}/log" >> $HOME/.bashrc
 
 # Reloads the .bashrc file (with added PYTHONPATH entry)
 source ~/.bashrc
@@ -56,9 +58,10 @@ source ~/.bashrc
 # pip installs the same modules on Linux systems
 echo "Installing python modules."
 if [[ $OSTYPE == darwin* ]] ; then
-  sudo easy_install requests, bs4, lxml
+  sudo easy_install requests bs4 lxml
 elif [[ $OSTYPE == linux* ]] ; then
-  pip install requests, bs4, lxml
+  pip install requests bs4 lxml
+fi
 
 
 # Creates the pair-guides script that simply runs the python script.
@@ -67,4 +70,4 @@ echo "${PROJECT_DIR}/src/pair-guides.py" > "${PROJECT_DIR}/pair-guides"
 chmod +x "${PROJECT_DIR}/pair-guides"
 
 
-cd $START_DIR
+cd "${START_DIR}"

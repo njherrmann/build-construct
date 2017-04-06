@@ -1,0 +1,18 @@
+# The settings file must specify the CCDS_ID and input_file.
+# The CCDS_ID is used to look up the exon boundaries
+# The input_file is the filepath to a ChopChop results text-output.
+# All other settings are optional.
+
+
+CCDS_ID             CCDS7612
+input_file          /home/n/Projects/coding/grna-block-builder/NM_005308_results.txt
+
+
+# NB: blank lines and comments (which start with #) are ignored
+
+# output_file      [input_file basename]_pairs.csv   ### The output filepath.
+# gRNA2_start_G    True         ### True if gRNA 2 must start with G
+# separation_limit 10           ### Maximum kbp between cut sites
+# latest_gRNA2     0.5          ### Position of gRNA 2 as a fraction of + strand exon content
+# min_exon_deletion 0           ### Minimum number of exon bps between cut sites
+# max_offtargets   0 0 0 0      ### Maximum allowed off-targets
