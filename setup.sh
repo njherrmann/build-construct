@@ -1,7 +1,9 @@
 START_DIR="${PWD}"
+START_DIR=`echo $START_DIR | sed 's/\ /\\ /g'`
 
 # Binds to the project directory when using bash
 PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_DIR=`echo $PROJECT_DIR | sed 's/\ /\\ /g'`
 
 echo "Appending project directory to PATH variable."
 PATH=$PROJECT_DIR:$PATH
