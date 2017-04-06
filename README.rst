@@ -1,0 +1,50 @@
+4/5/2017
+Nathaniel Herrmann
+naherrmann@gmail.com
+https://github.com/njherrmann/pair-guides
+
+
+
+CRISPR/Cas9 dual-gRNA Guide Pairer
+==================================
+
+The pair-guides script finds viable gRNA pairs for dual-guide gene blocks and saves these candidates to a simple CSV table.
+
+
+
+Requirements
+------------
+
+The pair-guides script runs with Python 2.7 or greater. At present, the setup script runs on Mac and Linux only. It utilizes the following potentially nonstandard python modules: requests, bs4, lxml.
+
+There is no app version of the script yet. Find instructions below to run the script from the command line.
+
+
+
+Installation/Setup
+------------------
+
+The project directory contains a script named setup.sh. Using the Terminal, navigate to the project directory and run the setup script by executing the following shell command:
+
+  bash setup.sh
+
+
+
+Usage
+-----
+
+The pair-guides script requires two files to run: a settings file and a ChopChop results file. The settings file is labeled gene_block_settings.inp. The settings file must contain the CCDS ID number of the gene and the path to the ChopChop results textfile. The script includes a handful of optional settings that can also be specified. Find a sample settings file in the project directory that contains notes on these optional settings and their default values.
+
+The ChopChop results file can be obtained by navigating to the ChopChop page for the desired gene and selecting "Results table" from the drop-down menu labeled "Download results." Save the text file on the new results page.
+
+The easiest way to run the script is to save the ChopChop results file and the settings file to the same directory. From this directory, simply run:
+  
+  pair-guides
+
+This should create one output file. By default the output file will end with "_pairs.csv" after the basename of the results file. When running the script this way, the settings file must be named either "gene_block_settings.inp" or simply "settings.inp".
+
+Alternately, the script can accept the settings file as a command-line input. This can be used to access a settings file from a distinct directory. This command looks like this:
+
+  pair-guides path/to/settings/file
+
+This method has the advantage of allowing a settings file with any name.
