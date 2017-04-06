@@ -26,7 +26,7 @@ Installation/Setup
 
 The project directory contains a script named setup.sh. Using the Terminal, navigate to the project directory and run the setup script by executing the following shell command:
 
-  bash setup.sh
+  . setup.sh
 
 
 
