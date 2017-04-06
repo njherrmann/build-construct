@@ -1,5 +1,4 @@
 *.pyc
-*.txt
 *.csv
 *pair-guides
 log/
