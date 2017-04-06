@@ -5,7 +5,7 @@
 
 
 CCDS_ID             CCDS7612
-input_file          /home/n/Projects/coding/grna-block-builder/NM_005308_results.txt
+input_file          src/NM_005308_results.txt
 
 
 # NB: blank lines and comments (which start with #) are ignored
