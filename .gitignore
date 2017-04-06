@@ -1,5 +1,7 @@
 *.pyc
 *.csv
+*.doc
 *pair-guides
 log/
+tests/
 .DS_Store
