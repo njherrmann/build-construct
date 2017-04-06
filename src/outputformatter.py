@@ -4,7 +4,7 @@ import csv
 
 
 class OutputFormatter(object):
-  """Writes potential construct data to a csv file."""
+  """Writes potential gene block data to a csv file."""
 
   def __init__(self, constants_file):
     self.logger = log.getLogger(__name__)
@@ -15,7 +15,7 @@ class OutputFormatter(object):
 
 
   def _read_gene_block_constants(self, constsfilepath):
-    """Reads constant elements of the gene block construct."""
+    """Reads constant elements of the gene block."""
     
     with open(constsfilepath, 'r') as constsfile:
       for line in constsfile:
@@ -24,8 +24,8 @@ class OutputFormatter(object):
 
 
 
-  def _assemble_construct(self, guidepair):
-    """Assembles the gene block constants and the sequences into a full construct string."""
+  def _assemble_gene_block(self, guidepair):
+    """Assembles the gene block constants and the sequences into a full gene block string."""
 
     return self.gene_block_constants['u6prom__cln_hom_arm'] + \
               guidepair.seq1.sequence + \
@@ -54,7 +54,7 @@ class OutputFormatter(object):
                        'gRNA separation (bp)', 
                        'del count (bp)', 'del%', 
                        '',
-                       'full construct'])
+                       'full gene block'])
 
       for pair in guidepairs:
         writer.writerow([pair.seq1.sequence, pair.seq1.gnm_loc,
@@ -71,6 +71,6 @@ class OutputFormatter(object):
                          pair.deletion_count,
                          pair.deletion_pct,
                          '',
-                         self._assemble_construct(pair)])
+                         self._assemble_gene_block(pair)])
 
-    self.logger.info('Successfully wrote constructs to %s' % outfilepath.split('/')[-1])
+    self.logger.info('Successfully wrote candidate pairs to %s' % outfilepath.split('/')[-1])

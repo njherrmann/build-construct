@@ -14,7 +14,7 @@ import outputformatter as of
 if __name__ == '__main__':
 
   logger = log.getLogger("main")
-  logger.info('Building constructs in %s' % os.getcwd())
+  logger.info('Pairing gRNAs in %s' % os.getcwd())
 
   # Binds project_dir the base project directory
   #   where the gene_block_constants.const file should be stored.
@@ -25,17 +25,17 @@ if __name__ == '__main__':
 
   # The settings file can be specified as a cmd-line input
   # otherwise, the script will search the working dir for
-  # a file named settings.inp or construct_settings.inp
+  # a file named settings.inp or gene_block_settings.inp
   settings_file = None
   if len(sys.argv) >= 2:
     settings_file = sys.argv[1]
-  elif os.path.exists('construct_settings.inp'):
-    settings_file = 'construct_settings.inp'
+  elif os.path.exists('gene_block_settings.inp'):
+    settings_file = 'gene_block_settings.inp'
   elif os.path.exists('settings.inp'):
     settings_file = 'settings.inp'
   else:
     logger.error('Cannot find a settings file. Specify a file as input or ' +
-                  'run build-construct in a directory with construct_settings.inp')
+                  'run pair-guides in a directory with gene_block_settings.inp')
     exit()
 
   settings = sr.SettingsReader(settings_file)
