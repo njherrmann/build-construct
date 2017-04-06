@@ -1,6 +1,10 @@
 ** TOP LEVEL **
 
-- Cache 
+- Cache exon edges once they have been read for a directory?
+
+- Is it possible to read the exon edges from a genbank file?
+
+- Modify the gene block constants 
 
 
 

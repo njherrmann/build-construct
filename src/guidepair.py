@@ -9,11 +9,6 @@ class GuidePair(object):
     self.seq1 = seq1
     self.seq2 = seq2
 
-    # reorders seq1 and seq2 so that seq1 is upstream
-    if seq1.cut_site > seq2.cut_site:
-      self.seq1, self.seq2 = seq2, seq1
-
-
     self.genomic_separation = abs(self.seq2.cut_site - self.seq1.cut_site)
 
 
@@ -34,28 +29,31 @@ class GuidePair(object):
                                   exon_edges, 0)
 
     self.deletion_count = 0
+
+    left_cut = min(self.seq1.cut_site, self.seq2.cut_site)
+    right_cut = max(self.seq1.cut_site, self.seq2.cut_site)
     
     for edge in exon_edges:
 
-      if edge[1] <= self.seq1.cut_site:
+      if edge[1] <= left_cut:
         # XXXXX----|---|--
         continue
 
-      elif edge[0] <= self.seq1.cut_site < edge[1] <= self.seq2.cut_site:
+      elif edge[0] <= left_cut < edge[1] <= right_cut:
         # XXX|XXXXX----|--
-        self.deletion_count += (edge[1] - self.seq1.cut_site)
+        self.deletion_count += (edge[1] - left_cut)
 
-      elif edge[0] <= self.seq1.cut_site and self.seq2.cut_site < edge[1]:
+      elif edge[0] <= left_cut and right_cut < edge[1]:
         # XXX|XXXXXX|XXX
-        self.deletion_count += (self.seq2.cut_site - self.seq1.cut_site)
+        self.deletion_count += (right_cut - left_cut)
 
-      elif self.seq1.cut_site < edge[0] and edge[1] <= self.seq2.cut_site:
+      elif left_cut < edge[0] and edge[1] <= right_cut:
         # -|--XXXXXX---|--
         self.deletion_count += (edge[1] - edge[0] + 1)
 
-      elif self.seq1.cut_site < edge[0] <= self.seq2.cut_site < edge[1]:
+      elif left_cut < edge[0] <= right_cut < edge[1]:
         # --|---XXXXX|XXX
-        self.deletion_count += (self.seq2.cut_site - edge[0] + 1)
+        self.deletion_count += (right_cut - edge[0] + 1)
 
       else:   # self.seq2.cut_site < edge[0]
         break

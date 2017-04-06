@@ -1,6 +1,7 @@
 *.pyc
 *.csv
-*.doc
+*.doc*
+*.dot*
 *pair-guides
 log/
 tests/

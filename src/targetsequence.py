@@ -83,7 +83,7 @@ class TargetSequence(object):
 
 
 
-  def set_gene_loc_frac(self, exon_edges):
+  def set_gene_loc_frac(self, exon_edges, gene_strand):
     """Sets gene_loc_frac attribute, which is the ratio given by the
     number of exon bps upstream of the cut site divided by the gene size."""
 
@@ -98,7 +98,8 @@ class TargetSequence(object):
         gene_loc += max(0 , self.cut_site+1 - edge[0])
         break
 
-    self.gene_loc_frac = float(gene_loc) / gene_size
+    self.gene_loc_frac = ((float(gene_loc) / gene_size) if gene_strand == '+'
+                          else (1 - (float(gene_loc) / gene_size)))
 
 
 

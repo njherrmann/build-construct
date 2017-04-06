@@ -42,8 +42,11 @@ class GuideBuilder(object):
 
     self.settings = settings
 
-    if not('input_file' in self.settings.keys() and 'CCDS_ID' in self.settings.keys()):
-      self.logger.error('Cannot instantiate GuideBuilder without input_file and CCDS_ID settings.')
+    if not('input_file' in self.settings.keys() and
+           'CCDS_ID' in self.settings.keys() and
+           'strand' in self.settings.keys()):
+      self.logger.error('Cannot instantiate GuideBuilder without ' +
+                        'input_file, CCDS_ID, and strand settings.')
 
     # Copies unspecified fields to settings from _DEFAULTS
     for key, value in GuideBuilder._DEFAULTS.items():
@@ -107,7 +110,7 @@ class GuideBuilder(object):
                           self.exon_edges, 0)
         self._filter_targets_in_exons()
         for seq in self.sequences:
-          seq.set_gene_loc_frac(self.exon_edges)
+          seq.set_gene_loc_frac(self.exon_edges, self.settings['strand'])
 
     self.logger.info('Successfully read input file %s' % self.settings['input_file'].split('/')[-1])
 
@@ -116,12 +119,13 @@ class GuideBuilder(object):
 
   def sort_sequences(self, keystr=None):
     """Sorts the list of sequences in place by a given field. 
-    Sequences are sorted by ascending genomic location by default (no keystr)"""
+    By default (no keystr), sequences are sorted by genomic location.
+    If the strand setting is '-', the sequences are sorted in descending order."""
 
     if keystr is None or keystr == "gnm_loc":
-      self.sequences.sort(key=lambda seq: seq.gnm_loc)
+      self.sequences.sort(key=lambda seq: seq.gnm_loc * (-1 if self.settings['strand'] == '-' else 1))
     if keystr == "cut_site":
-      self.sequences.sort(key=lambda seq: seq.cut_site)
+      self.sequences.sort(key=lambda seq: seq.cut_site * (-1 if self.settings['strand'] == '-' else 1))
     else:
       self.logger.warning("Cannot sort pair list: invalid key string")
 
@@ -129,10 +133,10 @@ class GuideBuilder(object):
 
   def sort_pairs(self, keystr=None):
     """Sorts the list of GuidePairs in place by a given field. 
-    Pairs are sorted by ascending genomic location of seq1 by default (no keystr)"""
+    Pairs are sorted by genomic location of seq1 by default (no keystr)"""
 
     if keystr is None or keystr == "gnm_loc" or keystr == "genomic_location":
-      self.guidepairs.sort(key=lambda pair: pair.seq1.gnm_loc)
+      self.guidepairs.sort(key=lambda pair: pair.seq1.gnm_loc * (-1 if self.settings['strand'] == '-' else 1))
     elif keystr == "gen_sep" or keystr == "genomic_separation":
       self.guidepairs.sort(key=lambda pair: pair.genomic_separation)
     elif keystr == "del_count" or keystr == "deletion_count":
@@ -156,7 +160,7 @@ class GuideBuilder(object):
     self._filter_targets_in_exons()
     
     for seq in self.sequences:
-      seq.set_gene_loc_frac(self.exon_edges)
+      seq.set_gene_loc_frac(self.exon_edges, self.settings['strand'])
 
 
 
@@ -206,7 +210,8 @@ class GuideBuilder(object):
     self.guidepairs = []
 
 
-    # Sorts sequences by ascending genomic location
+    # Sorts sequences by location of cut_site
+    # Ascending if gene falls on +strand, descending on -strand
     self.sort_sequences(keystr="cut_site")
 
     # A queue of gRNAs awaiting second sequences to pair

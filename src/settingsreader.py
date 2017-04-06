@@ -33,10 +33,13 @@ class SettingsReader(object):
 
 
         if tokens[0].lower() == 'input_file':
-          self.settings['input_file'] = tokens[1]
+          self.settings['input_file'] = ' '.join(tokens[1:])
 
         elif tokens[0].lower() == 'ccds_id':
           self.settings['CCDS_ID'] = tokens[1]
+
+        elif tokens[0].lower() == 'strand':
+          self.settings['strand'] = tokens[1]
 
         elif tokens[0].lower() == 'output_file':
           self.settings['output_file'] = tokens[1]
