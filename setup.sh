@@ -7,6 +7,7 @@ PROJECT_DIR=`echo $PROJECT_DIR | sed 's/\ /\\ /g'`
 
 echo "Appending project directory to PATH variable."
 PATH=$PROJECT_DIR:$PATH
+PROFILE=""
 
 # Adds a line to the bash profile that always adds the project directory
 # to the $PATH environment variable
@@ -15,12 +16,14 @@ if [ -f "$HOME/.bash_profile" ] ; then
 
 # Added by build-construct setup script
 PATH=\"${PROJECT_DIR}:\$PATH\"" >> $HOME/.bash_profile
+  PROFILE=.bash_profile
 
 elif [ -f "$HOME/.profile" ] ; then
   echo "
 
 # Added by build-construct setup script
 PATH=\"${PROJECT_DIR}:\$PATH\"" >> $HOME/.profile
+  PROFILE=.profile
 
 else
   echo "
@@ -29,6 +32,7 @@ else
 
 # Added by build-construct setup script
 PATH=\"${PROJECT_DIR}:\$PATH\"" >> $HOME/.bash_profile
+  PROFILE=.bash_profile
 fi
 
 
@@ -42,6 +46,22 @@ if ! [ -d "${PROJECT_DIR}/log" ] ; then
 else
   echo "Logging repo found."
 fi
+
+
+# Adds .bashrc invocation to profile if no bashrc file exists.
+if ! [ -f "$HOME/.bashrc" ]; then
+  echo "Linking new .bashrc file."
+  echo "
+
+# if running bash
+if [ -n \"\$BASH_VERSION\" ]; then
+    # include .bashrc if it exists
+    if [ -f \"\$HOME/.bashrc\" ]; then
+     . \"$HOME/.bashrc\"
+    fi
+fi" > $HOME/$PROFILE
+fi
+
 
 
 # Adds log to the python path variable on startup
