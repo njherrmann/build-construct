@@ -68,8 +68,8 @@ fi
 
 # Creates the pair-guides script that simply runs the python script.
 echo "Building master script."
-echo "${PROJECT_DIR}/src/pair-guides.py" > "${PROJECT_DIR}/pair-guides"
-chmod +x "${PROJECT_DIR}/pair-guides"
+echo $PROJECT_DIR/src/pair-guides.py | sed 's/\ /\\ /g' > "$PROJECT_DIR/pair-guides"
+chmod +x "$PROJECT_DIR/pair-guides"
 
 
-cd "${START_DIR}"
+cd "$START_DIR"
