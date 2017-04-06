@@ -59,7 +59,7 @@ if [ -n \"\$BASH_VERSION\" ]; then
     if [ -f \"\$HOME/.bashrc\" ]; then
      . \"$HOME/.bashrc\"
     fi
-fi" > $HOME/$PROFILE
+fi" >> $HOME/$PROFILE
 fi
 
 
