@@ -52,7 +52,7 @@ class OutputFormatter(object):
                         'off-targets 2', 
                         '',
                        'gRNA separation (bp)', 
-                       'del count (bp)', 'del%', 
+                       'del count (bp)', 'del%', 'frameshift',
                        '',
                        'full gene block'])
 
@@ -70,6 +70,7 @@ class OutputFormatter(object):
                          pair.genomic_separation,
                          pair.deletion_count,
                          pair.deletion_pct,
+                         ('no' if pair.deletion_count % 3 == 0 else 'yes'),
                          '',
                          self._assemble_gene_block(pair)])
 
