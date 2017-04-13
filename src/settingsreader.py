@@ -20,9 +20,9 @@ class SettingsReader(object):
       
       for line in settingsfile:
         
-        # Comments are prefixed by hash marks
-        if line[0] == '#':
-          continue
+        # Strips all text after the first hash mark
+        if line.find('#') >= 0:
+          line = line[ : line.find('#')]
         
         tokens = line.strip().split()
 
@@ -42,7 +42,7 @@ class SettingsReader(object):
           self.settings['strand'] = tokens[1]
 
         elif tokens[0].lower() == 'output_file':
-          self.settings['output_file'] = tokens[1]
+          self.settings['output_file'] = ' '.join(tokens[1:])
 
         elif tokens[0].lower() == 'grna2_start_g':
           if (str(tokens[1]).lower() == 't' or str(tokens[1]).lower() == 'true' or

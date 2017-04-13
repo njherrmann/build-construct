@@ -1,15 +1,12 @@
 # The settings file must specify the CCDS_ID, input_file, and gene strand.
 # The CCDS_ID is used to look up the exon boundaries
 # The input_file is the filepath to a ChopChop results text-output.
-# The strand is either '+' or '-'. 
-#   Genomic locations decrease across a '-' strand gene
 # All other settings are optional.
 
 
 # These demo files are for the grk5 gene
 CCDS_ID     CCDS7612
 input_file  NM_005308_results.txt
-strand      +
 
 
 # NB: blank lines and comments (which start with #) are ignored

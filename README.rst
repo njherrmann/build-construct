@@ -24,7 +24,7 @@ There is no app version of the script yet. Find instructions below to run the sc
 Installation/Setup
 ------------------
 
-The project directory contains a script named setup.sh. Using the Terminal, navigate to the project directory and run the setup script by executing the following shell command:
+The project directory contains a script named setup.sh. Using the Terminal, navigate to the project directory and run the setup script by executing the following shell command (do not omit the period before the script invocation):
 
   . setup.sh
 
@@ -82,3 +82,14 @@ The project directory contains the following files:
   log/ - repo containing a logging utility (built by setup.sh)
 
   pair-guides - bash script that runs pair-guides.py (built by setup.sh)
+
+
+
+Updating from GitHub
+--------------------
+
+Update the project directory to the latest version by pulling from the GitHub repository. This update command is enclosed in the script file update.sh. Run this update command by executing the following line from the project directory (do not omit the period before the script invocation):
+
+  . update.sh
+
+NB: The update will not be successful if the files in the base project directory have been modified (or the files in the demo and src directories). The one exception to this rule is word documents. Git will ignore word files (with the .doc or .docx extension).

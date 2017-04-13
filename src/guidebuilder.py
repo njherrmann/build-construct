@@ -43,10 +43,9 @@ class GuideBuilder(object):
     self.settings = settings
 
     if not('input_file' in self.settings.keys() and
-           'CCDS_ID' in self.settings.keys() and
-           'strand' in self.settings.keys()):
+           'CCDS_ID' in self.settings.keys()):
       self.logger.error('Cannot instantiate GuideBuilder without ' +
-                        'input_file, CCDS_ID, and strand settings.')
+                        'input_file and CCDS_ID.')
 
     # Copies unspecified fields to settings from _DEFAULTS
     for key, value in GuideBuilder._DEFAULTS.items():
@@ -55,6 +54,7 @@ class GuideBuilder(object):
 
     if 'input_file' in self.settings.keys():
       self.read()
+
 
 
   def clear(self):
