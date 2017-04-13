@@ -42,7 +42,7 @@ if __name__ == '__main__':
   logger.info('Reading settings from %s' % settings_file)
 
   loader = ccds.CcdsLoader()
-  loader.load(settings.settings['CCDS_ID'])
+  loader.load(settings.settings)
   edges = loader.get_exon_edges()
   
 
@@ -52,5 +52,8 @@ if __name__ == '__main__':
   builder.sort_pairs(keystr="deletion_count")
   pairs = builder.get_pairs()
 
-  outputter = of.OutputFormatter(project_dir + '/gene_block_constants.const')
-  outputter.write(pairs, settings.settings['output_file'])
+  if len(pairs) == 0:
+    logger.warning('Unable to find guide pairs with given settings.')
+  else:
+    outputter = of.OutputFormatter(project_dir + '/gene_block_constants.const')
+    outputter.write(pairs, settings.settings['output_file'])
