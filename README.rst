@@ -33,7 +33,7 @@ The project directory contains a script named setup.sh. Using the Terminal, navi
 Usage
 -----
 
-The pair-guides script requires two files to run: a settings file and a ChopChop results file. The settings file is labeled gene_block_settings.inp. The settings file must contain the CCDS ID number of the gene, the path to the ChopChop results textfile, and strand of the coding sequence. The script includes a handful of optional settings that can also be specified. Find a sample settings file in the project directory that contains notes on these optional settings and their default values.
+The pair-guides script requires two files to run: a settings file and a ChopChop results file. The settings file is labeled gene_block_settings.inp. The settings file must contain the CCDS ID number of the gene and the path to the ChopChop results textfile. The script includes a handful of optional settings that can also be specified. Find a sample settings file in the project directory that contains notes on these optional settings and their default values.
 
 The ChopChop results file can be obtained by navigating to the ChopChop page for the desired gene and selecting "Results table" from the drop-down menu labeled "Download results." Save the text file on the new results page.
 
